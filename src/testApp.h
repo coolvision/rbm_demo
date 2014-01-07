@@ -11,6 +11,7 @@ public:
 
     // initially, used only for rectangular images
     int image_side;
+    int h_image_side; // image used for hidden units visualization
 
     // number of visible and hidden units
     int n_visible;
@@ -44,6 +45,8 @@ public:
 class testApp : public ofBaseApp{
 
     vector<ofImage *> images;
+
+    RBM *rbm;
 
 	public:
 		void setup();
