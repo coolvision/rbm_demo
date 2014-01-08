@@ -23,11 +23,19 @@ public:
     int n_visible;
     int n_hidden;
 
-    float *v; // units activations, sampled
+    // visible units from data
+    float *v_data;
+
+    // hidden nodes, positive phase
+    float *h_prob;
     float *h;
 
-    float *v_prob; // units activation probabilities
-    float *h_prob;
+    // negarive phase
+    float *v_negative_prob; // units activation probabilities
+    float *v_negative; // units activations, sampled
+
+    float *h_negative_prob;
+    float *h_negative;
 
     float *b;   // weights
     float *c;
@@ -41,15 +49,21 @@ public:
     // stochastic sampling step
     void update();
 
-    void CDUpdate(); // weights learning update
-
     // images for visualization
     void makeImages();
+
     vector<ofImage *> filters;
-    ofImage *v_image;
-    ofImage *h_image;
-    ofImage *v_prob_image;
+
+    ofImage *v_data_image;
+
     ofImage *h_prob_image;
+    ofImage *h_image;
+
+    ofImage *v_n_prob_image;
+    ofImage *v_n_image;
+
+    ofImage *h_n_prob_image;
+    ofImage *h_n_image;
 };
 
 
