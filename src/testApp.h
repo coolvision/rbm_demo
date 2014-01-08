@@ -30,8 +30,8 @@ public:
     // init units and weights randomly, in some reasonable ranges
     void randomInit();
 
-    // run stochastic sampling for some number of iterations
-    void gibbsStep(int n);
+    // stochastic sampling step
+    void update();
 
     // images for visualization
     void makeImages();

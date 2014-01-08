@@ -4,6 +4,15 @@
 
 float sigmoid(float x) { return (1.0 / (1.0 + exp(-x))); }
 
+void RBM::update() {
+
+
+
+
+
+
+}
+
 RBM::RBM(int image_side, int n_hidden) {
 
     this->image_side = image_side;
@@ -120,10 +129,6 @@ void RBM::makeImages() {
     h_image->update();
 }
 
-void RBM::gibbsStep(int n) {
-
-}
-
 //--------------------------------------------------------------
 int reverseInt(int i) {
     unsigned char ch1, ch2, ch3, ch4;
@@ -134,8 +139,18 @@ int reverseInt(int i) {
     return ((int) ch1 << 24) + ((int) ch2 << 16) + ((int) ch3 << 8) + ch4;
 }
 
+#include <Eigen/Dense>
+using Eigen::MatrixXd;
+
 //--------------------------------------------------------------
 void testApp::setup() {
+
+    MatrixXd m(2,2);
+    m(0,0) = 3;
+    m(1,0) = 2.5;
+    m(0,1) = -1;
+    m(1,1) = m(1,0) + m(0,1);
+    std::cout << m << std::endl;
 
     ofSeedRandom();
 
