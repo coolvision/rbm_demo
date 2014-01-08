@@ -32,12 +32,16 @@ public:
     float *b;   // weights
     float *c;
     float *W;
+    float *pos_weights; // for gradient approximation
+    float *neg_weights;
 
     // init units and weights randomly, in some reasonable ranges
     void randomInit();
 
     // stochastic sampling step
     void update();
+
+    void CDUpdate(); // weights learning update
 
     // images for visualization
     void makeImages();

@@ -5,11 +5,36 @@
 //--------------------------------------------------------------
 void testApp::draw() {
 
+    ofDrawBitmapString(ofToString(ofGetFrameRate()), 10, 500);
+
     // draw dataset images
-    for (int i = 0; i < images.size(); i++) {
-        images[i]->draw(ofGetWindowWidth() - 280 - 10 +
-                        28 * (i % 10), 10+ 28 * (i / 10));
+    int image_i = 0;
+    for (deque<ofImage *>::iterator i = images.begin(); i < images.end(); i++) {
+        if (image_i > 100) {
+            break;
+        }
+        (*i)->draw(ofGetWindowWidth() - 280 - 10 +
+                        28 * (image_i % 10), 10 + 28 * (image_i / 10));
+        image_i++;
     }
+
+    // get the next image
+    if (images.empty()) {
+        readBatch(100);
+        return;
+    }
+    ofImage *img = images.back();
+    images.pop_back();
+
+    // put the image into the visible nodes
+    unsigned char *px = img->getPixels();
+    for (int i = 0; i < rbm->n_visible; i++) {
+        rbm->v[i] = (float) (px[i] > 128);
+    }
+
+    // remove this image from the storage
+    img->clear();
+    delete img;
 
     rbm->update();
     rbm->makeImages();
@@ -42,6 +67,8 @@ int reverseInt(int i) {
 //--------------------------------------------------------------
 void testApp::setup() {
 
+    ofSetFrameRate(60);
+
     rbm = new RBM(28, 100);
     rbm->randomInit();
 
@@ -50,49 +77,54 @@ void testApp::setup() {
     // make an images array
 
     string path = ofToDataPath("train-images-idx3-ubyte", true);
-    ifstream file(path.c_str(), ios::binary);
+    data_file.open(path.c_str(), ios::binary);
 
-    if (file.is_open()) {
-
-        int magic_number = 0;
-        int number_of_images = 0;
-        int n_rows = 0;
-        int n_cols = 0;
-        file.read((char*) &magic_number, sizeof(magic_number));
+    if (data_file.is_open()) {
+        data_file.read((char*) &magic_number, sizeof(magic_number));
         magic_number = reverseInt(magic_number);
-        file.read((char*) &number_of_images, sizeof(number_of_images));
+        data_file.read((char*) &number_of_images, sizeof(number_of_images));
         number_of_images = reverseInt(number_of_images);
-        file.read((char*) &n_rows, sizeof(n_rows));
+        data_file.read((char*) &n_rows, sizeof(n_rows));
         n_rows = reverseInt(n_rows);
-        file.read((char*) &n_cols, sizeof(n_cols));
+        data_file.read((char*) &n_cols, sizeof(n_cols));
         n_cols = reverseInt(n_cols);
-
-        ofImage img;
-
-        for (int i = 0; i < 200; i++) {
-
-            // add an image
-            images.push_back(new ofImage());
-            images.back()->allocate(28, 28, OF_IMAGE_GRAYSCALE);
-            unsigned char *px = images.back()->getPixels();
-
-            if (i % 100 == 0) {
-                cout << "images: " << i << endl;
-            }
-
-            // fill with bytes
-            for (int r = 0; r < n_rows; r++) {
-                for (int c = 0; c < n_cols; c++) {
-                    //unsigned char tmp;
-                    file.read((char*) px, 1);
-                    px++;
-                }
-            }
-
-            images.back()->update();
-        }
     }
 
+    readBatch(100);
+}
+
+bool testApp::readBatch(int n) {
+
+    if (!data_file.is_open()) {
+        return false;
+    }
+
+    for (int i = 0; i < n; i++) {
+
+        // add an image
+        images.push_back(new ofImage());
+        images.back()->allocate(28, 28, OF_IMAGE_GRAYSCALE);
+        unsigned char *px = images.back()->getPixels();
+
+        if (i % 100 == 0) {
+            cout << "images: " << i << endl;
+        }
+
+        // fill with bytes
+        for (int r = 0; r < n_rows; r++) {
+            for (int c = 0; c < n_cols; c++) {
+                if (data_file.eof()) {
+                    return false;
+                }
+                data_file.read((char*) px, 1);
+                px++;
+            }
+        }
+
+        images.back()->update();
+    }
+
+    return true;
 }
 
 //--------------------------------------------------------------
