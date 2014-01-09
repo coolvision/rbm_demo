@@ -53,6 +53,8 @@ public:
     void makeImages();
 
     vector<ofImage *> filters;
+    ofImage *v_bias;
+    ofImage *h_bias;
 
     ofImage *v_data_image;
 

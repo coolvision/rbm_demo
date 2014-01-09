@@ -40,6 +40,11 @@ RBM::RBM(int image_side, int n_hidden) {
 
     h_image_side = sqrt(n_hidden);
 
+    v_bias = new ofImage();
+    v_bias->allocate(image_side, image_side, OF_IMAGE_GRAYSCALE);
+    h_bias = new ofImage();
+    h_bias->allocate(h_image_side, h_image_side, OF_IMAGE_GRAYSCALE);
+
     v_data_image = new ofImage();
     v_data_image->allocate(image_side, image_side, OF_IMAGE_GRAYSCALE);
 
@@ -81,6 +86,7 @@ RBM::~RBM() {
 }
 
 double randn(double mu, double sigma) {
+
     static bool deviateAvailable = false;
     static float storedDeviate; // deviate from previous calculation
     double polar, rsquared, var1, var2;
@@ -125,11 +131,12 @@ void RBM::randomInit() {
     memset(c, 0, n_hidden * sizeof(float));
 
     for (int i = 0; i < n_visible * n_hidden; i++) {
-        W[i] = randn(0.0, 0.0001);
+        W[i] = randn(0.0, 0.001);
     }
 
     for (int i = 0; i < n_visible; i++) {
-        v_data[i] = ofRandom(1.0f) > 0.5 ? 1.0f : 0.0f;
+        v_data[i] = 1.0f;
     }
+
 }
 

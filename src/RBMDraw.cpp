@@ -18,31 +18,40 @@ void RBM::makeImages() {
         float max_v = -FLT_MAX;
 
         for (int j = 0; j < n_visible; j++) {
-            int w_i = i * n_visible + j;
-            if (W[w_i] > max_v)
-                max_v = W[w_i];
-            if (W[w_i] < min_v)
-                min_v = W[w_i];
+            int w_i = j * n_hidden + i;
+            float w = W[w_i];
+
+            if (w > max_v)
+                max_v = w;
+            if (w < min_v)
+                min_v = w;
         }
 
         for (int j = 0; j < n_visible; j++) {
-            int w_i = i * n_visible + j;
+            int w_i = j * n_hidden + i;
+            float w = W[w_i];
 
-            if (W[w_i] > 0) {
+            if (w < 0) {
                 filters[i]->setColor(j % image_side, j / image_side,
-                        ofColor(((W[w_i] - min_v) / (max_v - min_v)) * 255.0f));
+                                     ofColor(((w - min_v) / (max_v - min_v)) * 255.0f, 0.0f, 0.0f));
             } else {
                 filters[i]->setColor(j % image_side, j / image_side,
-                        ofColor(((W[w_i] - min_v) / (max_v - min_v)) * 255.0f,
-                                0.0f, 0.0f));
+                                     ofColor(((w - min_v) / (max_v - min_v)) * 255.0f));
             }
-        }
 
+        }
+    }
+
+    for (int i = 0; i < n_hidden; i++) {
         filters[i]->update();
     }
 
     // activation probabilities and sampled activations
     for (int i = 0; i < n_visible; i++) {
+
+        v_bias->setColor(i % image_side, i / image_side,
+                ofColor(b[i] * 255.0f));
+
         v_data_image->setColor(i % image_side, i / image_side,
                 ofColor(v_data[i] * 255.0f));
         v_n_prob_image->setColor(i % image_side, i / image_side,
@@ -52,6 +61,10 @@ void RBM::makeImages() {
     }
 
     for (int i = 0; i < n_hidden; i++) {
+
+        h_bias->setColor(i % h_image_side, i / h_image_side,
+                ofColor(c[i] * 255.0f));
+
         h_image->setColor(i % h_image_side, i / h_image_side,
                 ofColor(h[i] * 255.0f));
         h_n_image->setColor(i % h_image_side, i / h_image_side,
@@ -80,6 +93,9 @@ void RBM::makeImages() {
         h_n_prob_image->setColor(i % h_image_side, i / h_image_side,
                 ofColor((h_prob[i] / max_v) * 255.0f));
     }
+
+    v_bias->update();
+    h_bias->update();
 
     v_data_image->update();
     v_n_prob_image->update();
