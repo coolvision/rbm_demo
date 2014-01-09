@@ -16,14 +16,14 @@ RBM::RBM(int image_side, int n_hidden) {
     // allocate memory for units and weights
     v_data = new float[n_visible];
 
+    h_data_prob = new float[n_hidden];
+    h_data = new float[n_hidden];
+
+    v_prob = new float[n_visible];
+    v = new float[n_visible];
+
     h_prob = new float[n_hidden];
     h = new float[n_hidden];
-
-    v_negative_prob = new float[n_visible];
-    v_negative = new float[n_visible];
-
-    h_negative_prob = new float[n_hidden];
-    h_negative = new float[n_hidden];
 
     b = new float[n_visible];
     c = new float[n_hidden];
@@ -48,34 +48,34 @@ RBM::RBM(int image_side, int n_hidden) {
     v_data_image = new ofImage();
     v_data_image->allocate(image_side, image_side, OF_IMAGE_GRAYSCALE);
 
+    h_data_prob_image = new ofImage();
+    h_data_prob_image->allocate(h_image_side, h_image_side, OF_IMAGE_GRAYSCALE);
+    h_data_image = new ofImage();
+    h_data_image->allocate(h_image_side, h_image_side, OF_IMAGE_GRAYSCALE);
+
+    v_prob_image = new ofImage();
+    v_prob_image->allocate(image_side, image_side, OF_IMAGE_GRAYSCALE);
+    v_image = new ofImage();
+    v_image->allocate(image_side, image_side, OF_IMAGE_GRAYSCALE);
+
     h_prob_image = new ofImage();
     h_prob_image->allocate(h_image_side, h_image_side, OF_IMAGE_GRAYSCALE);
     h_image = new ofImage();
     h_image->allocate(h_image_side, h_image_side, OF_IMAGE_GRAYSCALE);
-
-    v_n_prob_image = new ofImage();
-    v_n_prob_image->allocate(image_side, image_side, OF_IMAGE_GRAYSCALE);
-    v_n_image = new ofImage();
-    v_n_image->allocate(image_side, image_side, OF_IMAGE_GRAYSCALE);
-
-    h_n_prob_image = new ofImage();
-    h_n_prob_image->allocate(h_image_side, h_image_side, OF_IMAGE_GRAYSCALE);
-    h_n_image = new ofImage();
-    h_n_image->allocate(h_image_side, h_image_side, OF_IMAGE_GRAYSCALE);
 }
 
 RBM::~RBM() {
 
     delete[] v_data;
 
+    delete[] h_data_prob;
+    delete[] h_data;
+
+    delete[] v_prob;
+    delete[] v;
+
     delete[] h_prob;
     delete[] h;
-
-    delete[] v_negative_prob;
-    delete[] v_negative;
-
-    delete[] h_negative_prob;
-    delete[] h_negative;
 
     delete[] b;
     delete[] c;
@@ -131,12 +131,15 @@ void RBM::randomInit() {
     memset(c, 0, n_hidden * sizeof(float));
 
     for (int i = 0; i < n_visible * n_hidden; i++) {
-        W[i] = randn(0.0, 0.001);
+        W[i] = randn(0.0, 0.01);
     }
 
     for (int i = 0; i < n_visible; i++) {
-        v_data[i] = 1.0f;
+        v[i] = randn(0.0, 0.1);
     }
 
+    for (int i = 0; i < n_hidden; i++) {
+        h[i] = randn(0.0, 0.1);
+    }
 }
 

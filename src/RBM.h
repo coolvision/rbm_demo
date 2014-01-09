@@ -23,19 +23,17 @@ public:
     int n_visible;
     int n_hidden;
 
-    // visible units from data
+    // units from data
     float *v_data;
+    float *h_data_prob;
+    float *h_data;
 
-    // hidden nodes, positive phase
+    // running sampling
+    float *v_prob;  // for CD1, set to data, run the chain
+    float *v;       // for PCD, run the chain independently
+
     float *h_prob;
     float *h;
-
-    // negarive phase
-    float *v_negative_prob; // units activation probabilities
-    float *v_negative; // units activations, sampled
-
-    float *h_negative_prob;
-    float *h_negative;
 
     float *b;   // weights
     float *c;
@@ -57,15 +55,14 @@ public:
     ofImage *h_bias;
 
     ofImage *v_data_image;
+    ofImage *h_data_prob_image;
+    ofImage *h_data_image;
+
+    ofImage *v_prob_image;
+    ofImage *v_image;
 
     ofImage *h_prob_image;
     ofImage *h_image;
-
-    ofImage *v_n_prob_image;
-    ofImage *v_n_image;
-
-    ofImage *h_n_prob_image;
-    ofImage *h_n_image;
 };
 
 

@@ -14,6 +14,7 @@ class testApp: public ofBaseApp {
     int number_of_images;
     int n_rows;
     int n_cols;
+    int n_images_read;
 
     RBM *rbm;
 

@@ -8,6 +8,10 @@ bool next_img = false;
 //--------------------------------------------------------------
 void testApp::draw() {
 
+    ofSetColor(ofColor::black);
+    ofDrawBitmapString(ofToString(n_images_read), ofGetWindowWidth() - 50, 320);
+    ofSetColor(ofColor::white);
+
     // draw dataset images
     int image_i = 0;
     for (deque<ofImage *>::iterator i = images.begin(); i < images.end(); i++) {
@@ -19,17 +23,48 @@ void testApp::draw() {
         image_i++;
     }
 
+    int img_size = rbm->image_side * 3;
+
+    rbm->v_data_image->draw(10, 10, img_size, img_size);
+
+    rbm->h_data_prob_image->draw(10, 10 + (img_size + 10) * 1, img_size , img_size);
+    rbm->h_data_image->draw(20 + img_size, 10 + (img_size + 10) * 1, img_size, img_size);
+
+    rbm->v_prob_image->draw(10, 10 + (img_size + 10) * 2, img_size, img_size);
+    rbm->v_image->draw(20 + img_size, 10 + (img_size + 10) * 2, img_size, img_size);
+
+    rbm->h_prob_image->draw(10, 10 + (img_size + 10) * 3, img_size, img_size);
+    rbm->h_image->draw(20 + img_size, 10 + (img_size + 10) * 3, img_size, img_size);
+
+    int fiter_size = 56;
+    int side = 10;
+    for (int i = 0; i < rbm->filters.size(); i++) {
+        rbm->filters[i]->draw(30 + img_size * 2 + fiter_size * (i / side),
+                              10 + fiter_size * (i % side), fiter_size, fiter_size);
+    }
+
+    rbm->v_bias->draw(30 + img_size * 2, 590,
+                      img_size, img_size);
+    rbm->h_bias->draw(30 + img_size * 2, 690,
+                      img_size, img_size);
+
+
+
+
     // get the next image
     if (images.empty()) {
         readBatch(100);
         return;
     }
 
-    next_img = true;
-    update_step = true;
+    for (int s = 0; s < 1; s++) {
 
-    if (next_img) {
-        next_img = false;
+        if (update_step) {
+            update_step = false;
+
+        if (images.empty()) {
+            break;
+        }
 
         ofImage *img = images.back();
         images.pop_back();
@@ -38,46 +73,18 @@ void testApp::draw() {
         unsigned char *px = img->getPixels();
         for (int i = 0; i < rbm->n_visible; i++) {
             rbm->v_data[i] = (float) (px[i] > 128);
+            //rbm->v_data[i] = (float)px[i] / 255.0f;
         }
 
         img->clear();
         delete img;
-    }
 
-    if (update_step) {
-        for (int i = 0; i < 3; i++) {
-            rbm->update();
+        rbm->update();
+
         }
-        update_step = false;
     }
 
     rbm->makeImages();
-
-    int img_size = rbm->image_side * 3;
-
-    rbm->v_data_image->draw(10, 10, img_size, img_size);
-
-    rbm->h_prob_image->draw(10, 10 + (img_size + 10) * 1, img_size , img_size);
-    rbm->h_image->draw(20 + img_size, 10 + (img_size + 10) * 1, img_size, img_size);
-
-    rbm->v_n_prob_image->draw(10, 10 + (img_size + 10) * 2, img_size, img_size);
-    rbm->v_n_image->draw(20 + img_size, 10 + (img_size + 10) * 2, img_size, img_size);
-
-    rbm->h_n_prob_image->draw(10, 10 + (img_size + 10) * 3, img_size, img_size);
-    rbm->h_n_image->draw(20 + img_size, 10 + (img_size + 10) * 3, img_size, img_size);
-
-    int fiter_size = 56;
-    int side = 10;
-    for (int i = 0; i < rbm->filters.size(); i++) {
-        rbm->filters[i]->draw(30 + img_size * 2 + fiter_size * (i / side),
-                                 10 + fiter_size * (i % side), fiter_size, fiter_size);
-    }
-
-    rbm->v_bias->draw(30 + img_size * 2, 590,
-                      img_size, img_size);
-    rbm->h_bias->draw(30 + img_size * 2, 690,
-                       img_size, img_size);
-
 }
 
 //--------------------------------------------------------------
@@ -92,6 +99,8 @@ int reverseInt(int i) {
 
 //--------------------------------------------------------------
 void testApp::setup() {
+
+    n_images_read = 0;
 
     ofSetFrameRate(60);
 
@@ -143,6 +152,7 @@ bool testApp::readBatch(int n) {
 
         // add an image
         images.push_back(new ofImage());
+        n_images_read++;
         images.back()->allocate(28, 28, OF_IMAGE_GRAYSCALE);
         unsigned char *px = images.back()->getPixels();
 
