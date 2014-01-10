@@ -141,6 +141,17 @@ void RBM::randomInit() {
     memset(c_inc, 0, n_hidden * sizeof(float));
     memset(W_inc, 0, n_hidden * n_visible * sizeof(float));
 
+//    for (int i = 0; i < n_hidden; i++) {
+//        for (int j = 0; j < n_visible; j++) {
+//            if (j % image_side > 5 && j % image_side < 23 &&
+//                j / image_side > i / 4 && j / image_side < (i / 4) + 5) {
+//                    W[j * n_hidden + i] = 10.0f;
+//            } else {
+//                W[j * n_hidden + i] = 0.0f;
+//            }
+//        }
+//    }
+
     for (int i = 0; i < n_visible * n_hidden; i++) {
         W[i] = randn(0.0, 0.01);
     }

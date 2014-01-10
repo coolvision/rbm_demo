@@ -9,6 +9,8 @@
 
 #include "ofMain.h"
 
+double randn(double mu, double sigma);
+
 class RBM {
 public:
 

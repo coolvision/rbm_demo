@@ -57,130 +57,87 @@ void testApp::draw() {
         return;
     }
 
-    //for (int s = 0; s < 50; s++) {
-
-//        if (images.empty()) {
-//            break;
-//        }
-//
-//        ofImage *img = images.back();
-//        images.pop_back();
-
     if (update_step || continuous_update) {
 
         update_step = false;
 
-        for (int i = 0; i < rbm->n_visible; i++) {
-            rbm->v_data[i] = 0;
-        }
-
-        int d = rbm->image_side;
-
-
-        if (ofRandom(1.0f) > 0.5f) {
-            for (int i = 0; i < d/2; i++) {
-                for (int j = 0; j < d/2; j++) {
-                    rbm->v_data[i * d + j] = 1.0f;
-                }
-            }
-        }
-        if (ofRandom(1.0f) > 0.5f) {
-            for (int i = d/2; i < d; i++) {
-                for (int j = d/2; j < d; j++) {
-                    rbm->v_data[i * d + j] = 1.0f;
-                }
-            }
-        }
-        if (ofRandom(1.0f) > 0.5f) {
-            for (int i = d/2; i < d; i++) {
-                for (int j = 0; j < d/2; j++) {
-                    rbm->v_data[i * d + j] = 1.0f;
-                }
-            }
-        }
-        if (ofRandom(1.0f) > 0.5f) {
-            for (int i = 0; i < d/2; i++) {
-                for (int j = d/2; j < d; j++) {
-                    rbm->v_data[i * d + j] = 1.0f;
-                }
-            }
-        }
-
-
-
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = 0; i < d; i++) {
-//                for (int j = 0; j < d; j++) {
-//                    if (i == d / 2) {
-//                        rbm->v_data[i * d + j] = 1.0f;
-//                    }
-//                }
-//            }
-//        }
-//
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = 0; i < d; i++) {
-//                for (int j = 0; j < d; j++) {
-//                    if (j == d / 2) {
-//                        rbm->v_data[i * d + j] = 1.0f;
-//                    }
-//                }
-//            }
-//        }
-//
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = 0; i < d; i++) {
-//                for (int j = 0; j < d; j++) {
-//                    if (i == d - j && i < d / 2) {
-//                        rbm->v_data[i * d + j] = 1.0f;
-//                    }
-//                }
-//            }
-//        }
-//
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = 0; i < d; i++) {
-//                for (int j = 0; j < d; j++) {
-//                    if (i == d - j && i > d / 2) {
-//                        rbm->v_data[i * d + j] = 1.0f;
-//                    }
-//                }
-//            }
-//        }
-//
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = 0; i < d; i++) {
-//                for (int j = 0; j < d; j++) {
-//                    if (i == j && i < d / 2) {
-//                        rbm->v_data[i * d + j] = 1.0f;
-//                    }
-//                }
-//            }
-//        }
-//
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = 0; i < d; i++) {
-//                for (int j = 0; j < d; j++) {
-//                    if (i == j && i > d / 2) {
-//                        rbm->v_data[i * d + j] = 1.0f;
-//                    }
-//                }
-//            }
-//        }
-
-
-        // put the image into the visible nodes
-//        unsigned char *px = img->getPixels();
 //        for (int i = 0; i < rbm->n_visible; i++) {
-//            //rbm->v_data[i] = (float) (px[i] > 128);
-//            rbm->v_data[i] = (float)px[i] / 255.0f;
+//            rbm->v_data[i] = 0;
+//        }
+//
+//        int d = rbm->image_side;
+//
+//
+//        if (ofRandom(1.0f) > 0.5f) {
+//            for (int i = 0; i < d/2; i++) {
+//                for (int j = 0; j < d/2; j++) {
+//                    rbm->v_data[i * d + j] = 1.0f;
+//                }
+//            }
+//        }
+//        if (ofRandom(1.0f) > 0.5f) {
+//            for (int i = d/2; i < d; i++) {
+//                for (int j = d/2; j < d; j++) {
+//                    rbm->v_data[i * d + j] = 1.0f;
+//                }
+//            }
+//        }
+//        if (ofRandom(1.0f) > 0.5f) {
+//            for (int i = d/2; i < d; i++) {
+//                for (int j = 0; j < d/2; j++) {
+//                    rbm->v_data[i * d + j] = 1.0f;
+//                }
+//            }
+//        }
+//        if (ofRandom(1.0f) > 0.5f) {
+//            for (int i = 0; i < d/2; i++) {
+//                for (int j = d/2; j < d; j++) {
+//                    rbm->v_data[i * d + j] = 1.0f;
+//                }
+//            }
+//        }
+//
+//
+//        if (ofRandom(1.0f) > 0.5f) {
+//            for (int i = 0; i < d/2; i++) {
+//                for (int j = d/3; j < 2*d/3; j++) {
+//                    rbm->v_data[i * d + j] = 1.0f;
+//                }
+//            }
+//        }
+//        if (ofRandom(1.0f) > 0.5f) {
+//            for (int i = d/2; i < d; i++) {
+//                for (int j = d/3; j < 2*d/3; j++) {
+//                    rbm->v_data[i * d + j] = 1.0f;
+//                }
+//            }
+//        }
+//        if (ofRandom(1.0f) > 0.5f) {
+//            for (int i = d/3; i < 2*d/3; i++) {
+//                for (int j = 0; j < d/2; j++) {
+//                    rbm->v_data[i * d + j] = 1.0f;
+//                }
+//            }
+//        }
+//        if (ofRandom(1.0f) > 0.5f) {
+//            for (int i = d/3; i < 2*d/3; i++) {
+//                for (int j = d/2; j < d; j++) {
+//                    rbm->v_data[i * d + j] = 1.0f;
+//                }
+//            }
 //        }
 
-//        img->clear();
-//        delete img;
+        ofImage *img = images.back();
+        images.pop_back();
+        // put the image into the visible nodes
+        unsigned char *px = img->getPixels();
+        for (int i = 0; i < rbm->n_visible; i++) {
+            rbm->v_data[i] = (float) (px[i] > 128);
+        }
+        img->clear();
+        delete img;
 
         rbm->update();
-        //}
 
         rbm->makeImages();
 
@@ -204,7 +161,7 @@ void testApp::setup() {
 
     ofSetFrameRate(60);
 
-    rbm = new RBM(28, 25);
+    rbm = new RBM(28, 100);
     rbm->randomInit();
 
     ofSeedRandom();

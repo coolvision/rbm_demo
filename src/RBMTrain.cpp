@@ -14,8 +14,15 @@ float sigmoid(float x) {
 void RBM::update() {
 
     float learning_rate = 0.1;
-    float momentum = 0.5f;
+    float momentum = 0.0f;
     float weightcost = 0.0002;
+    //float weightcost = 0.0f;
+
+
+    // compute hidden units energy
+    
+
+
 
     // (positive phase)
     // compute hidden nodes activations and probabilities
@@ -28,11 +35,11 @@ void RBM::update() {
         h_data[i] = ofRandom(1.0f) > h_data_prob[i] ? 0.0f : 1.0f;
     }
 
-    for (int i = 0; i < n_hidden; i++) {
-        if (ofRandom(1.0f) > 0.5f) {
-            h_data[i] = 0.0f;
-        }
-    }
+//    for (int i = 0; i < n_hidden; i++) {
+//        if (ofRandom(1.0f) > 0.5f) {
+//            h_data[i] = 0.0f;
+//        }
+//    }
 
     // positive phase associations
     for (int i = 0; i < n_visible * n_hidden; i++) {
@@ -43,27 +50,27 @@ void RBM::update() {
         h[i] = h_data[i];
     }
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 10; i++) {
 
-    // run update for CD1 or persistent chain for PCD
-    for (int i = 0; i < n_visible; i++) {
-        v_prob[i] = 0.0f;
-        for (int j = 0; j < n_hidden; j++) {
-            v_prob[i] += b[i] + h[j] * W[i * n_hidden + j];
+        // run update for CD1 or persistent chain for PCD
+        for (int i = 0; i < n_visible; i++) {
+            v_prob[i] = 0.0f;
+            for (int j = 0; j < n_hidden; j++) {
+                v_prob[i] += b[i] + h[j] * W[i * n_hidden + j];
+            }
+            v_prob[i] = sigmoid(v_prob[i]);
+            v[i] = ofRandom(1.0f) > v_prob[i] ? 0.0f : 1.0f;
         }
-        v_prob[i] = sigmoid(v_prob[i]);
-        v[i] = ofRandom(1.0f) > v_prob[i] ? 0.0f : 1.0f;
-    }
 
-    // and hidden nodes
-    for (int i = 0; i < n_hidden; i++) {
-        h_prob[i] = 0.0f;
-        for (int j = 0; j < n_visible; j++) {
-            h_prob[i] += c[i] + v[j] * W[j * n_hidden + i];
+        // and hidden nodes
+        for (int i = 0; i < n_hidden; i++) {
+            h_prob[i] = 0.0f;
+            for (int j = 0; j < n_visible; j++) {
+                h_prob[i] += c[i] + v[j] * W[j * n_hidden + i];
+            }
+            h_prob[i] = sigmoid(h_prob[i]);
+            h[i] = ofRandom(1.0f) > h_prob[i] ? 0.0f : 1.0f;
         }
-        h_prob[i] = sigmoid(h_prob[i]);
-        h[i] = ofRandom(1.0f) > h_prob[i] ? 0.0f : 1.0f;
-    }
 
 //        for (int i = 0; i < n_hidden; i++) {
 //            if (ofRandom(1.0f) > 0.5f) {
@@ -79,9 +86,9 @@ void RBM::update() {
     }
 
     for (int i = 0; i < n_visible * n_hidden; i++) {
-        W_inc[i] = momentum * W_inc[i] +
-                learning_rate * (pos_weights[i] - neg_weights[i]) -
-                weightcost * W[i];
+        W_inc[i] = momentum * W_inc[i]
+                + learning_rate * (pos_weights[i] - neg_weights[i])
+                - weightcost * W[i];
         W[i] += W_inc[i];
     }
 
