@@ -32,6 +32,10 @@ RBM::RBM(int image_side, int n_hidden) {
     pos_weights = new float[n_visible * n_hidden];
     neg_weights = new float[n_visible * n_hidden];
 
+    b_inc = new float[n_visible];
+    c_inc = new float[n_hidden];
+    W_inc = new float[n_visible * n_hidden];
+
     filters.resize(n_hidden);
     for (int i = 0; i < n_hidden; i++) {
         filters[i] = new ofImage();
@@ -83,6 +87,10 @@ RBM::~RBM() {
     delete[] W;
     delete[] pos_weights;
     delete[] neg_weights;
+
+    delete[] b_inc;
+    delete[] c_inc;
+    delete[] W_inc;
 }
 
 double randn(double mu, double sigma) {
@@ -129,17 +137,20 @@ void RBM::randomInit() {
     // set units activations randomly
     memset(b, 0, n_visible * sizeof(float));
     memset(c, 0, n_hidden * sizeof(float));
+    memset(b_inc, 0, n_visible * sizeof(float));
+    memset(c_inc, 0, n_hidden * sizeof(float));
+    memset(W_inc, 0, n_hidden * n_visible * sizeof(float));
 
     for (int i = 0; i < n_visible * n_hidden; i++) {
         W[i] = randn(0.0, 0.01);
     }
 
-    for (int i = 0; i < n_visible; i++) {
-        v[i] = randn(0.0, 0.1);
-    }
-
-    for (int i = 0; i < n_hidden; i++) {
-        h[i] = randn(0.0, 0.1);
-    }
+//    for (int i = 0; i < n_visible; i++) {
+//        v[i] = randn(0.0, 0.1);
+//    }
+//
+//    for (int i = 0; i < n_hidden; i++) {
+//        h[i] = randn(0.0, 0.1);
+//    }
 }
 

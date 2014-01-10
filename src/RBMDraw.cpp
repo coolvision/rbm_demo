@@ -74,9 +74,8 @@ void RBM::makeImages() {
 
         h_bias->setColor(i % h_image_side, i / h_image_side,
                 ofColor(c[i] * 255.0f));
-
         h_data_image->setColor(i % h_image_side, i / h_image_side,
-                ofColor(h[i] * 255.0f));
+                ofColor(h_data[i] * 255.0f));
         h_image->setColor(i % h_image_side, i / h_image_side,
                 ofColor(h[i] * 255.0f));
     }

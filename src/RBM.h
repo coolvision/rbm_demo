@@ -38,6 +38,11 @@ public:
     float *b;   // weights
     float *c;
     float *W;
+
+    float *b_inc;   // weights
+    float *c_inc;
+    float *W_inc;
+
     float *pos_weights; // for gradient approximation
     float *neg_weights;
 
