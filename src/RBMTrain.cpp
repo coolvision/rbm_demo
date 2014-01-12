@@ -19,11 +19,23 @@ float sign(float x) {
     }
 }
 
-void RBM::update() {
+void RBM::update(int n_batches) {
 
     float learning_rate = 0.1;
     float momentum = 0.5f;
     float weightcost = 0.0002;
+
+    // get the next data item, put it into the visible units
+    if (sample_i >= n_training_samples) {
+        sample_i = 0;
+        sample_offset = training_data;
+        epoch_i++;
+    }
+    sample_i++;
+    for (int i = 0; i < n_visible; i++) {
+        v_data[i] = (*sample_offset > 128.0f);
+        sample_offset++;
+    }
 
     // (positive phase)
     // compute hidden nodes activations and probabilities

@@ -6,10 +6,15 @@
 
 class testApp: public ofBaseApp {
 
-    deque<ofImage *> images;
+    vector<ofImage *> images;
 
     // MNIST dataset info
     ifstream data_file;
+    ifstream labels_file;
+
+    float *training_data;
+    float *training_labels;
+
     int magic_number;
     int number_of_images;
     int n_rows;

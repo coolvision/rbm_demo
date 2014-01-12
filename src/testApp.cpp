@@ -9,18 +9,27 @@ bool next_img = false;
 //--------------------------------------------------------------
 void testApp::draw() {
 
-    ofSetColor(ofColor::black);
-    ofDrawBitmapString(ofToString(n_images_read), ofGetWindowWidth() - 50,
-            500 + 320);
-    ofSetColor(ofColor::white);
+    if (update_step || continuous_update) {
+        update_step = false;
+
+        rbm->update(1);
+
+        rbm->makeImages();
+    }
+
+    ofDrawBitmapStringHighlight("sample: " + ofToString(rbm->sample_i), 110, 25);
+    ofDrawBitmapStringHighlight("batch: " + ofToString(rbm->batch_i), 110, 40);
+    ofDrawBitmapStringHighlight("epoch: " + ofToString(rbm->epoch_i), 110, 55);
+    ofDrawBitmapStringHighlight("n: " + ofToString(rbm->n_training_samples), 110, 70);
+
 
     // draw dataset images
     int image_i = 0;
-    for (deque<ofImage *>::iterator i = images.begin(); i < images.end(); i++) {
-        if (image_i > 100) {
-            break;
-        }
-        (*i)->draw(ofGetWindowWidth() - 280 - 10 + 28 * (image_i % 10),
+    for (int i = 0; i < images.size(); i++) {
+        images[i]->draw(ofGetWindowWidth() - 280 - 10 + 28 * (image_i % 10),
+                520 + 28 * (image_i / 10));
+        ofDrawBitmapStringHighlight(ofToString(training_labels[i]),
+                ofGetWindowWidth() - 280 - 10 + 28 * (image_i % 10),
                 520 + 28 * (image_i / 10));
         image_i++;
     }
@@ -49,8 +58,6 @@ void testApp::draw() {
                 10 + fiter_size * (i % side), fiter_size, fiter_size);
     }
 
-
-
     for (int i = 0; i < rbm->filters.size(); i++) {
         ofDrawBitmapStringHighlight(ofToString(rbm->c[i]),
                 610 + img_size * 2 + fiter_size * (i / side),
@@ -62,32 +69,6 @@ void testApp::draw() {
 
     rbm->v_bias->draw(30 + img_size * 2, 590, img_size, img_size);
     rbm->h_bias->draw(30 + img_size * 2, 690, img_size, img_size);
-
-    // get the next image
-    if (images.empty()) {
-        readBatch(100);
-        return;
-    }
-
-    if (update_step || continuous_update) {
-
-        update_step = false;
-
-        ofImage *img = images.back();
-        images.pop_back();
-        // put the image into the visible nodes
-        unsigned char *px = img->getPixels();
-        for (int i = 0; i < rbm->n_visible; i++) {
-            rbm->v_data[i] = (float) (px[i] > 128);
-        }
-        img->clear();
-        delete img;
-
-        rbm->update();
-
-        rbm->makeImages();
-
-    }
 }
 
 //--------------------------------------------------------------
@@ -107,89 +88,97 @@ void testApp::setup() {
 
     ofSetFrameRate(60);
 
+    int n_vis_units = 28 * 28;
     rbm = new RBM(28, 100);
-    rbm->randomInit();
+    rbm->init();
 
     ofSeedRandom();
 
-    // make an images array
-
     string path = ofToDataPath("train-images-idx3-ubyte", true);
     data_file.open(path.c_str(), ios::binary);
+    path = ofToDataPath("train-labels-idx1-ubyte", true);
+    labels_file.open(path.c_str(), ios::binary);
 
-    if (data_file.is_open()) {
-        data_file.read((char*) &magic_number, sizeof(magic_number));
-        magic_number = reverseInt(magic_number);
-        data_file.read((char*) &number_of_images, sizeof(number_of_images));
-        number_of_images = reverseInt(number_of_images);
-        data_file.read((char*) &n_rows, sizeof(n_rows));
-        n_rows = reverseInt(n_rows);
-        data_file.read((char*) &n_cols, sizeof(n_cols));
-        n_cols = reverseInt(n_cols);
+    int n_vis_images = 10;
+
+    if (!data_file.is_open() || !labels_file.is_open()) {
+        exit();
     }
 
-    readBatch(100);
+    data_file.read((char*) &magic_number, sizeof(magic_number));
+    magic_number = reverseInt(magic_number);
+    data_file.read((char*) &number_of_images, sizeof(number_of_images));
+    number_of_images = reverseInt(number_of_images);
+    data_file.read((char*) &n_rows, sizeof(n_rows));
+    n_rows = reverseInt(n_rows);
+    data_file.read((char*) &n_cols, sizeof(n_cols));
+    n_cols = reverseInt(n_cols);
 
-    ofImage *img = images.back();
-    images.pop_back();
+    training_data = new float[number_of_images * n_vis_units];
+    float *dr = training_data;
 
-    // put the image into the visible nodes
-    unsigned char *px = img->getPixels();
-    for (int i = 0; i < rbm->n_visible; i++) {
-        rbm->v_data[i] = (float) (px[i] > 128);
-    }
+    int images_n = 10000;
 
-    img->clear();
-    delete img;
-
-}
-
-bool testApp::readBatch(int n) {
-
-    if (!data_file.is_open()) {
-        return false;
-    }
-
-    for (int i = 0; i < n; i++) {
+    // read all of the data
+    for (int i = 0; i < images_n; i++) {
 
         // add an image
-        images.push_back(new ofImage());
-        n_images_read++;
-        images.back()->allocate(28, 28, OF_IMAGE_GRAYSCALE);
-        unsigned char *px = images.back()->getPixels();
+        unsigned char *px;
+        if (i < n_vis_images) {
+            images.push_back(new ofImage());
+            n_images_read++;
+            images.back()->allocate(28, 28, OF_IMAGE_GRAYSCALE);
+            px = images.back()->getPixels();
+        }
 
-        if (i % 100 == 0) {
+        if (i % 1000 == 0) {
             cout << "images: " << i << endl;
         }
 
         // fill with bytes
         for (int r = 0; r < n_rows; r++) {
             for (int c = 0; c < n_cols; c++) {
+                uint8_t tmp;
+                data_file.read((char *)&tmp, 1);
 
-                if (data_file.eof()) {
+                *dr = (float)tmp;
+                dr++;
 
-                    data_file.close();
-                    string path = ofToDataPath("train-images-idx3-ubyte", true);
-
-                    data_file.open(path.c_str(), ios::binary);
-                    data_file.read((char*) &magic_number, sizeof(magic_number));
-                    magic_number = reverseInt(magic_number);
-                    data_file.read((char*) &number_of_images,
-                            sizeof(number_of_images));
-                    number_of_images = reverseInt(number_of_images);
-                    data_file.read((char*) &n_rows, sizeof(n_rows));
-                    n_rows = reverseInt(n_rows);
-                    data_file.read((char*) &n_cols, sizeof(n_cols));
-                    n_cols = reverseInt(n_cols);
-
-                    return false;
+                if (i < n_vis_images) {
+                    *px = tmp;
+                    px++;
                 }
-                data_file.read((char*) px, 1);
-                px++;
             }
         }
 
-        images.back()->update();
+        if (i < n_vis_images) {
+            images.back()->update();
+        }
+    }
+
+    labels_file.read((char*) &magic_number, sizeof(magic_number));
+    magic_number = reverseInt(magic_number);
+    labels_file.read((char*) &number_of_images, sizeof(number_of_images));
+    number_of_images = reverseInt(number_of_images);
+
+    training_labels = new float[number_of_images];
+    float *lr = training_labels;
+
+    for (int i = 0; i < number_of_images; i++) {
+        uint8_t tmp;
+        labels_file.read((char *)&tmp, 1);
+        *lr = (float) tmp;
+        lr++;
+    }
+
+    // init dataset for the RBM
+    rbm->setTrainData(training_data, training_labels, images_n, 100);
+}
+
+bool testApp::readBatch(int n) {
+
+    if (!data_file.is_open()) {
+        return false;
     }
 
     return true;

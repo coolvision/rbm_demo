@@ -17,8 +17,9 @@ public:
     RBM(int image_side, int n_hidden);
     ~RBM();
 
-    void setTrainData(float *data, int batch_size);
-    void randomInit(); // init weights
+    void setTrainData(float* data, float *labels,
+                      int n_samples, int batch_size);
+    void init(); // init weights
     void update(int n_batches); // sampling step
     void makeImages(); // images for visualization
 
@@ -30,12 +31,15 @@ public:
 
     // training stuff
     float *training_data;
-    int n_training_samples;
-    int sample_i;
+    float *labels;
+    float *sample_offset;
+    uint32_t n_training_samples;
+    uint32_t sample_i;
+    uint32_t epoch_i;
 
     // mini-batch training
-    int batch_size;
-    int batch_i;
+    uint32_t batch_size;
+    uint32_t batch_i;
 
     // basic learning parameters
     float learning_rate;
@@ -51,7 +55,6 @@ public:
     // activity monitoring
     float *mean_activity;   // per-hidden-unit weighted activity
     float q;                // total current hidden units activity
-    float *mean_weight;     // per-hidden-unit
 
     // units from data
     float *v_data;
@@ -73,8 +76,6 @@ public:
 
     float *pos_weights; // for gradient approximation
     float *neg_weights;
-
-
 
     vector<ofImage *> filters;
     ofImage *v_bias;

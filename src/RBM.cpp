@@ -7,7 +7,23 @@
 
 #include "RBM.h"
 
+void RBM::setTrainData(float* data, float *labels,
+        int n_samples, int batch_size) {
+
+    training_data = data;
+    sample_offset = data;
+    sample_i = 0;
+    n_training_samples = n_samples;
+    this->batch_size = batch_size;
+    this->labels = labels;
+}
+
 RBM::RBM(int image_side, int n_hidden) {
+
+    q = 0.0f;
+    sample_i = 0;
+    epoch_i = 0;
+    batch_i = 0;
 
     this->image_side = image_side;
     this->n_visible = image_side * image_side;
@@ -29,7 +45,6 @@ RBM::RBM(int image_side, int n_hidden) {
     c = new float[n_hidden];
 
     mean_activity = new float[n_hidden];
-    mean_weight = new float[n_hidden];
 
     W = new float[n_visible * n_hidden];
     pos_weights = new float[n_visible * n_hidden];
@@ -88,7 +103,6 @@ RBM::~RBM() {
     delete[] c;
 
     delete[] mean_activity;
-    delete[] mean_weight;
 
     delete[] W;
     delete[] pos_weights;
@@ -137,7 +151,7 @@ double randn(double mu, double sigma) {
     }
 }
 
-void RBM::randomInit() {
+void RBM::init() {
 
     // set biases to 0
     memset(b, 0, n_visible * sizeof(float));
@@ -147,9 +161,6 @@ void RBM::randomInit() {
     memset(W_inc, 0, n_hidden * n_visible * sizeof(float));
 
     memset(mean_activity, 0, n_hidden * sizeof(float));
-    memset(mean_weight, 0, n_hidden * sizeof(float));
-
-    q = 0.0f;
 
     for (int i = 0; i < n_visible * n_hidden; i++) {
         W[i] = randn(0.0, 0.01);
