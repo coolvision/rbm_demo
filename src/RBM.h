@@ -17,13 +17,41 @@ public:
     RBM(int image_side, int n_hidden);
     ~RBM();
 
-    // initially, used only for rectangular images
-    int image_side;
-    int h_image_side; // image used for hidden units visualization
+    void setTrainData(float *data, int batch_size);
+    void randomInit(); // init weights
+    void update(int n_batches); // sampling step
+    void makeImages(); // images for visualization
 
-    // number of visible and hidden units
-    int n_visible;
+    int image_side;     // initially, used only for rectangular images
+    int h_image_side;   // image used for hidden units visualization
+
+    int n_visible;  // number of visible and hidden units
     int n_hidden;
+
+    // training stuff
+    float *training_data;
+    int n_training_samples;
+    int sample_i;
+
+    // mini-batch training
+    int batch_size;
+    int batch_i;
+
+    // basic learning parameters
+    float learning_rate;
+    float momentum;
+    float weightcost; // L2 regularization
+
+    // additional options for better features
+    bool inhibit_sparsity;
+    float sparsity_k;
+    bool inhibit_selectivity;
+    float selectivity_k;
+
+    // activity monitoring
+    float *mean_activity;   // per-hidden-unit weighted activity
+    float q;                // total current hidden units activity
+    float *mean_weight;     // per-hidden-unit
 
     // units from data
     float *v_data;
@@ -31,31 +59,22 @@ public:
     float *h_data;
 
     // running sampling
-    float *v_prob;  // for CD1, set to data, run the chain
-    float *v;       // for PCD, run the chain independently
-
+    float *v_prob;
+    float *v;
     float *h_prob;
     float *h;
 
     float *b;   // weights
     float *c;
     float *W;
-
-    float *b_inc;   // weights
+    float *b_inc;
     float *c_inc;
     float *W_inc;
 
     float *pos_weights; // for gradient approximation
     float *neg_weights;
 
-    // init units and weights randomly, in some reasonable ranges
-    void randomInit();
 
-    // stochastic sampling step
-    void update();
-
-    // images for visualization
-    void makeImages();
 
     vector<ofImage *> filters;
     ofImage *v_bias;

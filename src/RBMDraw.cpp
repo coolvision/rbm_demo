@@ -41,27 +41,48 @@ void RBM::makeImages() {
         }
     }
 
-
-//    for (int i = 0; i < n_hidden; i++) {
-//        for (int j = 0; j < n_visible; j++) {
-//            int w_i = j * n_hidden + i;
-//            float w = W[w_i];
-//            filters[i]->setColor(j % image_side, j / image_side,
-//                                 ofColor(((w - min_v) / (max_v - min_v)) * 255.0f));
-//        }
-//    }
-
-
     for (int i = 0; i < n_hidden; i++) {
         filters[i]->update();
     }
 
+    min_v = FLT_MAX;
+    max_v = -FLT_MAX;
+    for (int i = 0; i < n_visible; i++) {
+        if (b[i] > max_v)
+            max_v = b[i];
+        if (b[i] < min_v)
+            min_v = b[i];
+    }
+    for (int i = 0; i < n_visible; i++) {
+        if (b[i] < 0.0f) {
+            v_bias->setColor(i % image_side, i / image_side,
+                         ofColor(((b[i] - min_v) / (max_v - min_v)) * 255.0f, 0.0f, 0.0f));
+        } else {
+            v_bias->setColor(i % image_side, i / image_side,
+                             ofColor(0.0f, 0.0f, ((b[i] - min_v) / (max_v - min_v)) * 255.0f));
+        }
+    }
+
+    min_v = FLT_MAX;
+    max_v = -FLT_MAX;
+    for (int i = 0; i < n_hidden; i++) {
+        if (c[i] > max_v)
+            max_v = c[i];
+        if (c[i] < min_v)
+            min_v = c[i];
+    }
+    for (int i = 0; i < n_hidden; i++) {
+                if (b[i] < 0.0f) {
+                    h_bias->setColor(i % h_image_side, i / h_image_side,
+                                     ofColor(((c[i] - min_v) / (max_v - min_v)) * 255.0f, 0.0f, 0.0f));
+                } else {
+                    h_bias->setColor(i % h_image_side, i / h_image_side,
+                                     ofColor(0.0f, 0.0f, ((c[i] - min_v) / (max_v - min_v)) * 255.0f));
+                }
+    }
+
     // activation probabilities and sampled activations
     for (int i = 0; i < n_visible; i++) {
-
-        v_bias->setColor(i % image_side, i / image_side,
-                ofColor(b[i] * 255.0f));
-
         v_data_image->setColor(i % image_side, i / image_side,
                 ofColor(v_data[i] * 255.0f));
         v_prob_image->setColor(i % image_side, i / image_side,
@@ -71,9 +92,6 @@ void RBM::makeImages() {
     }
 
     for (int i = 0; i < n_hidden; i++) {
-
-        h_bias->setColor(i % h_image_side, i / h_image_side,
-                ofColor(c[i] * 255.0f));
         h_data_image->setColor(i % h_image_side, i / h_image_side,
                 ofColor(h_data[i] * 255.0f));
         h_image->setColor(i % h_image_side, i / h_image_side,

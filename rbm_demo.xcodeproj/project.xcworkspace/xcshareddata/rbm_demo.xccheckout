@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>6073C9E0-6334-4F2C-A58D-61FACC8C8FE2</string>
+	<key>IDESourceControlProjectName</key>
+	<string>rbm_demo</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>4934DCB7-756A-4BCE-9E88-B4EC90940DAF</key>
+		<string>https://github.com/coolvision/rbm_demo.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>rbm_demo.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>4934DCB7-756A-4BCE-9E88-B4EC90940DAF</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/coolvision/rbm_demo.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>4934DCB7-756A-4BCE-9E88-B4EC90940DAF</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>4934DCB7-756A-4BCE-9E88-B4EC90940DAF</string>
+			<key>IDESourceControlWCCName</key>
+			<string>rbm_demo</string>
+		</dict>
+	</array>
+</dict>
+</plist>

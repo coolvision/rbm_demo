@@ -11,18 +11,19 @@ float sigmoid(float x) {
     return (1.0f / (1.0f + exp(-x)));
 }
 
+float sign(float x) {
+    if (x > 0.0f) {
+        return 1.0f;
+    } else {
+        return -1.0f;
+    }
+}
+
 void RBM::update() {
 
     float learning_rate = 0.1;
-    float momentum = 0.0f;
+    float momentum = 0.5f;
     float weightcost = 0.0002;
-    //float weightcost = 0.0f;
-
-
-    // compute hidden units energy
-    
-
-
 
     // (positive phase)
     // compute hidden nodes activations and probabilities
@@ -35,12 +36,6 @@ void RBM::update() {
         h_data[i] = ofRandom(1.0f) > h_data_prob[i] ? 0.0f : 1.0f;
     }
 
-//    for (int i = 0; i < n_hidden; i++) {
-//        if (ofRandom(1.0f) > 0.5f) {
-//            h_data[i] = 0.0f;
-//        }
-//    }
-
     // positive phase associations
     for (int i = 0; i < n_visible * n_hidden; i++) {
         pos_weights[i] = v_data[i / n_hidden] * h_data[i % n_hidden];
@@ -50,7 +45,24 @@ void RBM::update() {
         h[i] = h_data[i];
     }
 
-    for (int i = 0; i < 10; i++) {
+    // increasing selectivity
+    float activity_smoothing = 0.99f;
+    float total_active = 0.0f;
+    for (int i = 0; i < n_hidden; i++) {
+        mean_activity[i] = mean_activity[i] * activity_smoothing + h[i]
+                * (1.0f - activity_smoothing);
+        c[i] += (0.1f - mean_activity[i]) * 0.001f;
+        total_active += h[i];
+    }
+
+    // increasing sparseness
+    q = activity_smoothing * q +
+            (1.0f - activity_smoothing) * (total_active / (float)n_hidden);
+    for (int i = 0; i < n_hidden; i++) {
+        c[i] += (0.1f - q) * 0.001f;
+    }
+
+    for (int i = 0; i < 5; i++) {
 
         // run update for CD1 or persistent chain for PCD
         for (int i = 0; i < n_visible; i++) {
@@ -71,13 +83,6 @@ void RBM::update() {
             h_prob[i] = sigmoid(h_prob[i]);
             h[i] = ofRandom(1.0f) > h_prob[i] ? 0.0f : 1.0f;
         }
-
-//        for (int i = 0; i < n_hidden; i++) {
-//            if (ofRandom(1.0f) > 0.5f) {
-//                h[i] = 0.0f;
-//            }
-//        }
-
     }
 
     // negative phase associations

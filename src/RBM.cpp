@@ -28,6 +28,9 @@ RBM::RBM(int image_side, int n_hidden) {
     b = new float[n_visible];
     c = new float[n_hidden];
 
+    mean_activity = new float[n_hidden];
+    mean_weight = new float[n_hidden];
+
     W = new float[n_visible * n_hidden];
     pos_weights = new float[n_visible * n_hidden];
     neg_weights = new float[n_visible * n_hidden];
@@ -45,9 +48,9 @@ RBM::RBM(int image_side, int n_hidden) {
     h_image_side = sqrt(n_hidden);
 
     v_bias = new ofImage();
-    v_bias->allocate(image_side, image_side, OF_IMAGE_GRAYSCALE);
+    v_bias->allocate(image_side, image_side, OF_IMAGE_COLOR);
     h_bias = new ofImage();
-    h_bias->allocate(h_image_side, h_image_side, OF_IMAGE_GRAYSCALE);
+    h_bias->allocate(h_image_side, h_image_side, OF_IMAGE_COLOR);
 
     v_data_image = new ofImage();
     v_data_image->allocate(image_side, image_side, OF_IMAGE_GRAYSCALE);
@@ -83,6 +86,9 @@ RBM::~RBM() {
 
     delete[] b;
     delete[] c;
+
+    delete[] mean_activity;
+    delete[] mean_weight;
 
     delete[] W;
     delete[] pos_weights;
@@ -134,34 +140,19 @@ double randn(double mu, double sigma) {
 void RBM::randomInit() {
 
     // set biases to 0
-    // set units activations randomly
     memset(b, 0, n_visible * sizeof(float));
     memset(c, 0, n_hidden * sizeof(float));
     memset(b_inc, 0, n_visible * sizeof(float));
     memset(c_inc, 0, n_hidden * sizeof(float));
     memset(W_inc, 0, n_hidden * n_visible * sizeof(float));
 
-//    for (int i = 0; i < n_hidden; i++) {
-//        for (int j = 0; j < n_visible; j++) {
-//            if (j % image_side > 5 && j % image_side < 23 &&
-//                j / image_side > i / 4 && j / image_side < (i / 4) + 5) {
-//                    W[j * n_hidden + i] = 10.0f;
-//            } else {
-//                W[j * n_hidden + i] = 0.0f;
-//            }
-//        }
-//    }
+    memset(mean_activity, 0, n_hidden * sizeof(float));
+    memset(mean_weight, 0, n_hidden * sizeof(float));
+
+    q = 0.0f;
 
     for (int i = 0; i < n_visible * n_hidden; i++) {
         W[i] = randn(0.0, 0.01);
     }
-
-//    for (int i = 0; i < n_visible; i++) {
-//        v[i] = randn(0.0, 0.1);
-//    }
-//
-//    for (int i = 0; i < n_hidden; i++) {
-//        h[i] = randn(0.0, 0.1);
-//    }
 }
 

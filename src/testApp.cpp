@@ -10,7 +10,8 @@ bool next_img = false;
 void testApp::draw() {
 
     ofSetColor(ofColor::black);
-    ofDrawBitmapString(ofToString(n_images_read), ofGetWindowWidth() - 50, 320);
+    ofDrawBitmapString(ofToString(n_images_read), ofGetWindowWidth() - 50,
+            500 + 320);
     ofSetColor(ofColor::white);
 
     // draw dataset images
@@ -20,7 +21,7 @@ void testApp::draw() {
             break;
         }
         (*i)->draw(ofGetWindowWidth() - 280 - 10 + 28 * (image_i % 10),
-                10 + 28 * (image_i / 10));
+                520 + 28 * (image_i / 10));
         image_i++;
     }
 
@@ -48,6 +49,17 @@ void testApp::draw() {
                 10 + fiter_size * (i % side), fiter_size, fiter_size);
     }
 
+
+
+    for (int i = 0; i < rbm->filters.size(); i++) {
+        ofDrawBitmapStringHighlight(ofToString(rbm->c[i]),
+                610 + img_size * 2 + fiter_size * (i / side),
+                30 + 50 * (i % side));
+        ofDrawBitmapStringHighlight(ofToString(rbm->mean_activity[i]),
+                610 + img_size * 2 + fiter_size * (i / side),
+                30 + 50 * (i % side) + 15, ofColor::red);
+    }
+
     rbm->v_bias->draw(30 + img_size * 2, 590, img_size, img_size);
     rbm->h_bias->draw(30 + img_size * 2, 690, img_size, img_size);
 
@@ -60,72 +72,6 @@ void testApp::draw() {
     if (update_step || continuous_update) {
 
         update_step = false;
-
-//        for (int i = 0; i < rbm->n_visible; i++) {
-//            rbm->v_data[i] = 0;
-//        }
-//
-//        int d = rbm->image_side;
-//
-//
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = 0; i < d/2; i++) {
-//                for (int j = 0; j < d/2; j++) {
-//                    rbm->v_data[i * d + j] = 1.0f;
-//                }
-//            }
-//        }
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = d/2; i < d; i++) {
-//                for (int j = d/2; j < d; j++) {
-//                    rbm->v_data[i * d + j] = 1.0f;
-//                }
-//            }
-//        }
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = d/2; i < d; i++) {
-//                for (int j = 0; j < d/2; j++) {
-//                    rbm->v_data[i * d + j] = 1.0f;
-//                }
-//            }
-//        }
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = 0; i < d/2; i++) {
-//                for (int j = d/2; j < d; j++) {
-//                    rbm->v_data[i * d + j] = 1.0f;
-//                }
-//            }
-//        }
-//
-//
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = 0; i < d/2; i++) {
-//                for (int j = d/3; j < 2*d/3; j++) {
-//                    rbm->v_data[i * d + j] = 1.0f;
-//                }
-//            }
-//        }
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = d/2; i < d; i++) {
-//                for (int j = d/3; j < 2*d/3; j++) {
-//                    rbm->v_data[i * d + j] = 1.0f;
-//                }
-//            }
-//        }
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = d/3; i < 2*d/3; i++) {
-//                for (int j = 0; j < d/2; j++) {
-//                    rbm->v_data[i * d + j] = 1.0f;
-//                }
-//            }
-//        }
-//        if (ofRandom(1.0f) > 0.5f) {
-//            for (int i = d/3; i < 2*d/3; i++) {
-//                for (int j = d/2; j < d; j++) {
-//                    rbm->v_data[i * d + j] = 1.0f;
-//                }
-//            }
-//        }
 
         ofImage *img = images.back();
         images.pop_back();
