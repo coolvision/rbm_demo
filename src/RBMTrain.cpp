@@ -19,18 +19,21 @@ float sign(float x) {
     }
 }
 
-void RBM::update(int n_batches) {
+// fall back to no mini-batch with batch_n == 1
+void RBM::updateMiniBatch() {
 
-    float learning_rate = 0.1;
+    float learning_rate = 0.05;
     float momentum = 0.5f;
     float weightcost = 0.0002;
 
     // get the next data item, put it into the visible units
+    // update with a training data batch
     if (sample_i >= n_training_samples) {
         sample_i = 0;
         sample_offset = training_data;
         epoch_i++;
     }
+
     sample_i++;
     for (int i = 0; i < n_visible; i++) {
         v_data[i] = (*sample_offset > 128.0f);
@@ -58,21 +61,21 @@ void RBM::update(int n_batches) {
     }
 
     // increasing selectivity
-    float activity_smoothing = 0.99f;
+    float activity_s = 0.99f;
     float total_active = 0.0f;
     for (int i = 0; i < n_hidden; i++) {
-        mean_activity[i] = mean_activity[i] * activity_smoothing + h[i]
-                * (1.0f - activity_smoothing);
-        c[i] += (0.1f - mean_activity[i]) * 0.001f;
+        mean_activity[i] = mean_activity[i] * activity_s + h[i]
+            * (1.0f - activity_s);
+        c[i] += (0.1f - mean_activity[i]) * 0.01f;
         total_active += h[i];
     }
 
     // increasing sparseness
-    q = activity_smoothing * q +
-            (1.0f - activity_smoothing) * (total_active / (float)n_hidden);
-    for (int i = 0; i < n_hidden; i++) {
-        c[i] += (0.1f - q) * 0.001f;
-    }
+//    q = activity_smoothing * q +
+//    (1.0f - activity_smoothing) * (total_active / (float)n_hidden);
+//    for (int i = 0; i < n_hidden; i++) {
+//        c[i] += (0.1f - q) * 0.01f;
+//    }
 
     for (int i = 0; i < 5; i++) {
 
@@ -111,13 +114,13 @@ void RBM::update(int n_batches) {
 
     for (int i = 0; i < n_visible; i++) {
         b_inc[i] *= momentum;
-        b_inc[i] += 0.01 * learning_rate * (v_data[i] - v[i]);
+        b_inc[i] += learning_rate * (v_data[i] - v[i]);
         b[i] += b_inc[i];
     }
 
     for (int i = 0; i < n_hidden; i++) {
         c_inc[i] *= momentum;
-        c_inc[i] += 0.01 * learning_rate * (h_data[i] - h[i]);
+        c_inc[i] += learning_rate * (h_data[i] - h[i]);
         c[i] += c_inc[i];
     }
 }

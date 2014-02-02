@@ -5,7 +5,7 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>6073C9E0-6334-4F2C-A58D-61FACC8C8FE2</string>
+	<string>F21BC1FE-1DD3-4781-8412-9AFFE198B3AC</string>
 	<key>IDESourceControlProjectName</key>
 	<string>rbm_demo</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
@@ -21,7 +21,7 @@
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/coolvision/rbm_demo.git</string>
+	<string>https://github.com/coolvision/ofxDynamicUI.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>

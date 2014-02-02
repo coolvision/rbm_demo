@@ -14,22 +14,29 @@ double randn(double mu, double sigma);
 class RBM {
 public:
 
-    RBM(int image_side, int n_hidden);
+    RBM();
     ~RBM();
 
-    void setTrainData(float* data, float *labels,
-                      int n_samples, int batch_size);
-    void init(); // init weights
-    void update(int n_batches); // sampling step
+    void init(int image_sqr, int n_hidden_sqr,
+            float* data, float *labels, int n_samples, int batch_size);
+    void allocate();
+    void release();
+    void setTrainMode(int train_method, int k);
+
+    void update();
+    void updateMiniBatch();
+    void updateSimParallel(); // code split into parallelizable pieces
+
     void makeImages(); // images for visualization
 
-    int image_side;     // initially, used only for rectangular images
-    int h_image_side;   // image used for hidden units visualization
+    int image_side; // initially, used only for rectangular images
+    int h_image_side; // image used for hidden units visualization
 
-    int n_visible;  // number of visible and hidden units
+    int n_visible; // number of visible and hidden units
     int n_hidden;
 
     // training stuff
+    //============================================================================
     float *training_data;
     float *labels;
     float *sample_offset;
@@ -44,17 +51,21 @@ public:
     // basic learning parameters
     float learning_rate;
     float momentum;
-    float weightcost; // L2 regularization
+    float weightcost;   // L2 regularization
+    bool pcd_on;        // persistent CD
+    int k;              // sampling steps number
 
     // additional options for better features
     bool inhibit_sparsity;
     float sparsity_k;
+    float sparsity_target;
     bool inhibit_selectivity;
     float selectivity_k;
+    float selectivity_target;
 
     // activity monitoring
-    float *mean_activity;   // per-hidden-unit weighted activity
-    float q;                // total current hidden units activity
+    float *mean_activity; // per-hidden-unit weighted activity
+    float q; // total current hidden units activity
 
     // units from data
     float *v_data;
@@ -67,7 +78,7 @@ public:
     float *h_prob;
     float *h;
 
-    float *b;   // weights
+    float *b; // weights
     float *c;
     float *W;
     float *b_inc;
@@ -76,6 +87,8 @@ public:
 
     float *pos_weights; // for gradient approximation
     float *neg_weights;
+
+    //============================================================================
 
     vector<ofImage *> filters;
     ofImage *v_bias;
@@ -91,5 +104,4 @@ public:
     ofImage *h_prob_image;
     ofImage *h_image;
 };
-
 

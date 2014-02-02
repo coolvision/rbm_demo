@@ -1,6 +1,7 @@
-#include "testApp.h"
 #include <iostream>
 #include "ofMain.h"
+
+#include "testApp.h"
 
 bool continuous_update = false;
 bool update_step = false;
@@ -12,16 +13,17 @@ void testApp::draw() {
     if (update_step || continuous_update) {
         update_step = false;
 
-        rbm->update(1);
+        rbm->updateMiniBatch();
 
         rbm->makeImages();
     }
 
-    ofDrawBitmapStringHighlight("sample: " + ofToString(rbm->sample_i), 110, 25);
+    ofDrawBitmapStringHighlight("sample: " + ofToString(rbm->sample_i), 110,
+            25);
     ofDrawBitmapStringHighlight("batch: " + ofToString(rbm->batch_i), 110, 40);
     ofDrawBitmapStringHighlight("epoch: " + ofToString(rbm->epoch_i), 110, 55);
-    ofDrawBitmapStringHighlight("n: " + ofToString(rbm->n_training_samples), 110, 70);
-
+    ofDrawBitmapStringHighlight("n: " + ofToString(rbm->n_training_samples),
+            110, 70);
 
     // draw dataset images
     int image_i = 0;
@@ -51,13 +53,14 @@ void testApp::draw() {
     rbm->h_image->draw(20 + img_size, 10 + (img_size + 10) * 3, img_size,
             img_size);
 
-    int fiter_size = 56;
-    int side = 10;
+    int fiter_size = 28;
+    int side = rbm->h_image_side;
     for (int i = 0; i < rbm->filters.size(); i++) {
         rbm->filters[i]->draw(30 + img_size * 2 + fiter_size * (i / side),
                 10 + fiter_size * (i % side), fiter_size, fiter_size);
     }
 
+    fiter_size = 80;
     for (int i = 0; i < rbm->filters.size(); i++) {
         ofDrawBitmapStringHighlight(ofToString(rbm->c[i]),
                 610 + img_size * 2 + fiter_size * (i / side),
@@ -88,10 +91,6 @@ void testApp::setup() {
 
     ofSetFrameRate(60);
 
-    int n_vis_units = 28 * 28;
-    rbm = new RBM(28, 100);
-    rbm->init();
-
     ofSeedRandom();
 
     string path = ofToDataPath("train-images-idx3-ubyte", true);
@@ -114,7 +113,8 @@ void testApp::setup() {
     data_file.read((char*) &n_cols, sizeof(n_cols));
     n_cols = reverseInt(n_cols);
 
-    training_data = new float[number_of_images * n_vis_units];
+
+    training_data = new float[number_of_images * n_cols * n_rows];
     float *dr = training_data;
 
     int images_n = 10000;
@@ -139,9 +139,9 @@ void testApp::setup() {
         for (int r = 0; r < n_rows; r++) {
             for (int c = 0; c < n_cols; c++) {
                 uint8_t tmp;
-                data_file.read((char *)&tmp, 1);
+                data_file.read((char *) &tmp, 1);
 
-                *dr = (float)tmp;
+                *dr = (float) tmp;
                 dr++;
 
                 if (i < n_vis_images) {
@@ -166,13 +166,13 @@ void testApp::setup() {
 
     for (int i = 0; i < number_of_images; i++) {
         uint8_t tmp;
-        labels_file.read((char *)&tmp, 1);
+        labels_file.read((char *) &tmp, 1);
         *lr = (float) tmp;
         lr++;
     }
 
-    // init dataset for the RBM
-    rbm->setTrainData(training_data, training_labels, images_n, 100);
+    rbm = new RBM();
+    rbm->init(28, 10, training_data, training_labels, images_n, 1);
 }
 
 bool testApp::readBatch(int n) {

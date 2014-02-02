@@ -7,39 +7,76 @@
 
 #include "RBM.h"
 
-void RBM::setTrainData(float* data, float *labels,
-        int n_samples, int batch_size) {
+void RBM::setTrainMode(int train_method, int k) {
 
-    training_data = data;
-    sample_offset = data;
-    sample_i = 0;
-    n_training_samples = n_samples;
-    this->batch_size = batch_size;
-    this->labels = labels;
+    if (train_method == 0) {
+        pcd_on = false;
+    } else {
+        pcd_on = true;
+    }
+
+    this->k = k;
 }
 
-RBM::RBM(int image_side, int n_hidden) {
+void RBM::init(int image_sqr, int n_hidden_sqr,
+        float* data, float *labels, int n_samples, int batch_size) {
 
-    q = 0.0f;
+    training_data = data;
+    this->labels = labels;
+    n_training_samples = n_samples;
+
+    learning_rate = 0.05;
+    momentum = 0.5f;
+    weightcost = 0.0002;
+    pcd_on = false;
+    k = 5;
+
+    inhibit_sparsity = false;
+    sparsity_k = 0.01f;
+    sparsity_target = 0.1f;
+    inhibit_selectivity = false;
+    selectivity_k = 0.01;
+    selectivity_target = 0.1f;
+
     sample_i = 0;
     epoch_i = 0;
     batch_i = 0;
+    sample_offset = training_data;
+    this->batch_size = batch_size;
 
-    this->image_side = image_side;
-    this->n_visible = image_side * image_side;
-    this->n_hidden = n_hidden;
+    image_side = image_sqr;
+    h_image_side = n_hidden_sqr;
+    n_visible = image_side * image_side;
+    n_hidden = h_image_side * h_image_side;
+
+    allocate();
+
+    // set biases to 0
+    memset(b, 0, n_visible * sizeof(float));
+    memset(c, 0, n_hidden * sizeof(float));
+    memset(b_inc, 0, n_visible * sizeof(float));
+    memset(c_inc, 0, n_hidden * sizeof(float));
+    memset(W_inc, 0, n_hidden * n_visible * sizeof(float));
+
+    memset(mean_activity, 0, n_hidden * sizeof(float));
+    q = 0.0f;
+
+    for (int i = 0; i < n_visible * n_hidden; i++) {
+        W[i] = randn(0.0, 0.01);
+    }
+}
+
+void RBM::allocate() {
 
     // allocate memory for units and weights
-    v_data = new float[n_visible];
+    v_data = new float[n_visible * batch_size];
+    h_data_prob = new float[n_hidden * batch_size];
+    h_data = new float[n_hidden * batch_size];
 
-    h_data_prob = new float[n_hidden];
-    h_data = new float[n_hidden];
-
-    v_prob = new float[n_visible];
-    v = new float[n_visible];
-
-    h_prob = new float[n_hidden];
-    h = new float[n_hidden];
+    v_prob = new float[n_visible * batch_size];
+    v = new float[n_visible * batch_size];
+    h_prob = new float[n_hidden * batch_size];
+    h = new float[n_hidden * batch_size];
 
     b = new float[n_visible];
     c = new float[n_hidden];
@@ -59,8 +96,6 @@ RBM::RBM(int image_side, int n_hidden) {
         filters[i] = new ofImage();
         filters[i]->allocate(image_side, image_side, OF_IMAGE_COLOR);
     }
-
-    h_image_side = sqrt(n_hidden);
 
     v_bias = new ofImage();
     v_bias->allocate(image_side, image_side, OF_IMAGE_COLOR);
@@ -84,9 +119,10 @@ RBM::RBM(int image_side, int n_hidden) {
     h_prob_image->allocate(h_image_side, h_image_side, OF_IMAGE_GRAYSCALE);
     h_image = new ofImage();
     h_image->allocate(h_image_side, h_image_side, OF_IMAGE_GRAYSCALE);
+
 }
 
-RBM::~RBM() {
+void RBM::release() {
 
     delete[] v_data;
 
@@ -111,6 +147,16 @@ RBM::~RBM() {
     delete[] b_inc;
     delete[] c_inc;
     delete[] W_inc;
+}
+
+
+RBM::RBM() {
+
+}
+
+RBM::~RBM() {
+
+    release();
 }
 
 double randn(double mu, double sigma) {
@@ -151,19 +197,4 @@ double randn(double mu, double sigma) {
     }
 }
 
-void RBM::init() {
-
-    // set biases to 0
-    memset(b, 0, n_visible * sizeof(float));
-    memset(c, 0, n_hidden * sizeof(float));
-    memset(b_inc, 0, n_visible * sizeof(float));
-    memset(c_inc, 0, n_hidden * sizeof(float));
-    memset(W_inc, 0, n_hidden * n_visible * sizeof(float));
-
-    memset(mean_activity, 0, n_hidden * sizeof(float));
-
-    for (int i = 0; i < n_visible * n_hidden; i++) {
-        W[i] = randn(0.0, 0.01);
-    }
-}
 
