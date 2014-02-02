@@ -78,9 +78,10 @@ public:
     float *h_prob;
     float *h;
 
-    float *b; // weights
-    float *c;
+    float *vt;
+
     float *W;
+    float *Wt;
     float *b_inc;
     float *c_inc;
     float *W_inc;

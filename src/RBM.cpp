@@ -46,14 +46,14 @@ void RBM::init(int image_sqr, int n_hidden_sqr,
 
     image_side = image_sqr;
     h_image_side = n_hidden_sqr;
-    n_visible = image_side * image_side;
-    n_hidden = h_image_side * h_image_side;
+    n_visible = image_side * image_side + 1;    // additional bias unit
+    n_hidden = h_image_side * h_image_side + 1;
 
     allocate();
 
     // set biases to 0
-    memset(b, 0, n_visible * sizeof(float));
-    memset(c, 0, n_hidden * sizeof(float));
+    //memset(b, 0, n_visible * sizeof(float));
+    //memset(c, 0, n_hidden * sizeof(float));
     memset(b_inc, 0, n_visible * sizeof(float));
     memset(c_inc, 0, n_hidden * sizeof(float));
     memset(W_inc, 0, n_hidden * n_visible * sizeof(float));
@@ -78,12 +78,13 @@ void RBM::allocate() {
     h_prob = new float[n_hidden * batch_size];
     h = new float[n_hidden * batch_size];
 
-    b = new float[n_visible];
-    c = new float[n_hidden];
+    // store transposed data matrix
+    vt = new float[n_visible * batch_size];
 
     mean_activity = new float[n_hidden];
 
     W = new float[n_visible * n_hidden];
+    Wt = new float[n_visible * n_hidden]; // hold transposed weights
     pos_weights = new float[n_visible * n_hidden];
     neg_weights = new float[n_visible * n_hidden];
 
@@ -119,7 +120,6 @@ void RBM::allocate() {
     h_prob_image->allocate(h_image_side, h_image_side, OF_IMAGE_GRAYSCALE);
     h_image = new ofImage();
     h_image->allocate(h_image_side, h_image_side, OF_IMAGE_GRAYSCALE);
-
 }
 
 void RBM::release() {
@@ -135,12 +135,10 @@ void RBM::release() {
     delete[] h_prob;
     delete[] h;
 
-    delete[] b;
-    delete[] c;
-
     delete[] mean_activity;
 
     delete[] W;
+    delete[] Wt;
     delete[] pos_weights;
     delete[] neg_weights;
 

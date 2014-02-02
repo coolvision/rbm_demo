@@ -14,6 +14,7 @@ void testApp::draw() {
         update_step = false;
 
         rbm->updateMiniBatch();
+        //rbm->update();
 
         rbm->makeImages();
     }
@@ -53,7 +54,7 @@ void testApp::draw() {
     rbm->h_image->draw(20 + img_size, 10 + (img_size + 10) * 3, img_size,
             img_size);
 
-    int fiter_size = 28;
+    int fiter_size = 56;
     int side = rbm->h_image_side;
     for (int i = 0; i < rbm->filters.size(); i++) {
         rbm->filters[i]->draw(30 + img_size * 2 + fiter_size * (i / side),
@@ -62,7 +63,7 @@ void testApp::draw() {
 
     fiter_size = 80;
     for (int i = 0; i < rbm->filters.size(); i++) {
-        ofDrawBitmapStringHighlight(ofToString(rbm->c[i]),
+        ofDrawBitmapStringHighlight(ofToString(rbm->W[i]),
                 610 + img_size * 2 + fiter_size * (i / side),
                 30 + 50 * (i % side));
         ofDrawBitmapStringHighlight(ofToString(rbm->mean_activity[i]),
@@ -172,7 +173,7 @@ void testApp::setup() {
     }
 
     rbm = new RBM();
-    rbm->init(28, 10, training_data, training_labels, images_n, 1);
+    rbm->init(28, 15, training_data, training_labels, images_n, 10);
 }
 
 bool testApp::readBatch(int n) {
