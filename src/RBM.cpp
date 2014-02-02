@@ -98,6 +98,23 @@ void RBM::allocate() {
         filters[i]->allocate(image_side, image_side, OF_IMAGE_COLOR);
     }
 
+    images_n = batch_size;
+    v_data_images.resize(images_n);
+    h_data_images.resize(images_n);
+    v_prob_images.resize(images_n);
+    v_images.resize(images_n);
+
+    for (int i = 0; i < images_n; i++) {
+        v_data_images[i] = new ofImage();
+        h_data_images[i] = new ofImage();
+        v_prob_images[i] = new ofImage();
+        v_images[i] = new ofImage();
+        v_data_images[i]->allocate(image_side, image_side, OF_IMAGE_COLOR);
+        h_data_images[i]->allocate(h_image_side, h_image_side, OF_IMAGE_COLOR);
+        v_prob_images[i] ->allocate(image_side, image_side, OF_IMAGE_COLOR);
+        v_images[i]->allocate(image_side, image_side, OF_IMAGE_COLOR);
+    }
+
     v_bias = new ofImage();
     v_bias->allocate(image_side, image_side, OF_IMAGE_COLOR);
     h_bias = new ofImage();

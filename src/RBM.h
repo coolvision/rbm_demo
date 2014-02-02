@@ -95,6 +95,13 @@ public:
     ofImage *v_bias;
     ofImage *h_bias;
 
+    int images_n;
+    vector<ofImage *> v_data_images;
+    vector<ofImage *> h_data_prob_images;
+    vector<ofImage *> h_data_images;
+    vector<ofImage *> v_prob_images;
+    vector<ofImage *> v_images;
+
     ofImage *v_data_image;
     ofImage *h_data_prob_image;
     ofImage *h_data_image;

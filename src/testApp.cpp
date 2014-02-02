@@ -19,12 +19,13 @@ void testApp::draw() {
         rbm->makeImages();
     }
 
-    ofDrawBitmapStringHighlight("sample: " + ofToString(rbm->sample_i), 110,
+    float off_x = 350;
+    ofDrawBitmapStringHighlight("sample: " + ofToString(rbm->sample_i), off_x,
             25);
-    ofDrawBitmapStringHighlight("batch: " + ofToString(rbm->batch_i), 110, 40);
-    ofDrawBitmapStringHighlight("epoch: " + ofToString(rbm->epoch_i), 110, 55);
+    ofDrawBitmapStringHighlight("batch: " + ofToString(rbm->batch_i), off_x, 40);
+    ofDrawBitmapStringHighlight("epoch: " + ofToString(rbm->epoch_i), off_x, 55);
     ofDrawBitmapStringHighlight("n: " + ofToString(rbm->n_training_samples),
-            110, 70);
+            off_x, 70);
 
     // draw dataset images
     int image_i = 0;
@@ -37,27 +38,40 @@ void testApp::draw() {
         image_i++;
     }
 
-    int img_size = 90;
+    int img_size = 80;
+    for (int i = 0; i < rbm->images_n && i < rbm->batch_size; i++) {
+        rbm->v_data_images[i]->update();
+        rbm->h_data_images[i]->update();
+        rbm->v_prob_images[i]->update();
+        rbm->v_images[i]->update();
 
-    rbm->v_data_image->draw(10, 10, img_size, img_size);
+        rbm->v_data_images[i]->draw(10, 10 + img_size * i, img_size, img_size);
+        rbm->h_data_images[i]->draw(10 + img_size, 10 + img_size * i, img_size, img_size);
+        rbm->v_prob_images[i]->draw(10 + img_size * 2, 10 + img_size * i, img_size, img_size);
+        rbm->v_images[i]->draw(10 + img_size * 3, 10 + img_size * i, img_size, img_size);
+    }
 
-    rbm->h_data_prob_image->draw(10, 10 + (img_size + 10) * 1, img_size,
-            img_size);
-    rbm->h_data_image->draw(20 + img_size, 10 + (img_size + 10) * 1, img_size,
-            img_size);
+    //rbm->v_data_image->draw(10, 10, img_size, img_size);
 
-    rbm->v_prob_image->draw(10, 10 + (img_size + 10) * 2, img_size, img_size);
-    rbm->v_image->draw(20 + img_size, 10 + (img_size + 10) * 2, img_size,
-            img_size);
+//    rbm->h_data_prob_image->draw(10, 10 + (img_size + 10) * 1, img_size,
+//            img_size);
+//    rbm->h_data_image->draw(20 + img_size, 10 + (img_size + 10) * 1, img_size,
+//            img_size);
+//
+//    rbm->v_prob_image->draw(10, 10 + (img_size + 10) * 2, img_size, img_size);
+//    rbm->v_image->draw(20 + img_size, 10 + (img_size + 10) * 2, img_size,
+//            img_size);
+//
+//    rbm->h_prob_image->draw(10, 10 + (img_size + 10) * 3, img_size, img_size);
+//    rbm->h_image->draw(20 + img_size, 10 + (img_size + 10) * 3, img_size,
+//            img_size);
 
-    rbm->h_prob_image->draw(10, 10 + (img_size + 10) * 3, img_size, img_size);
-    rbm->h_image->draw(20 + img_size, 10 + (img_size + 10) * 3, img_size,
-            img_size);
 
-    int fiter_size = 56;
+
+    int fiter_size = 45;
     int side = rbm->h_image_side;
     for (int i = 0; i < rbm->filters.size(); i++) {
-        rbm->filters[i]->draw(30 + img_size * 2 + fiter_size * (i / side),
+        rbm->filters[i]->draw(300 + img_size * 2 + fiter_size * (i / side),
                 10 + fiter_size * (i % side), fiter_size, fiter_size);
     }
 
@@ -65,14 +79,15 @@ void testApp::draw() {
     for (int i = 0; i < rbm->filters.size(); i++) {
         ofDrawBitmapStringHighlight(ofToString(rbm->W[i]),
                 610 + img_size * 2 + fiter_size * (i / side),
-                30 + 50 * (i % side));
+                700 + 50 * (i % side));
         ofDrawBitmapStringHighlight(ofToString(rbm->mean_activity[i]),
                 610 + img_size * 2 + fiter_size * (i / side),
-                30 + 50 * (i % side) + 15, ofColor::red);
+                700 + 50 * (i % side) + 15, ofColor::red);
     }
 
-    rbm->v_bias->draw(30 + img_size * 2, 590, img_size, img_size);
-    rbm->h_bias->draw(30 + img_size * 2, 690, img_size, img_size);
+    img_size = 150;
+    rbm->v_bias->draw(1200, 10, img_size, img_size);
+    rbm->h_bias->draw(1200, 10 + img_size, img_size, img_size);
 }
 
 //--------------------------------------------------------------

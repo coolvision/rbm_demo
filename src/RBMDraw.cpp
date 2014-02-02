@@ -101,6 +101,22 @@ void RBM::makeImages() {
                 ofColor(v[i + 1] * 255.0f));
     }
 
+    for (int s = 0; (s < images_n && s < batch_size); s++) {
+        for (int i = 0; i < n_visible - 1; i++) {
+            v_data_images[s]->setColor(i % image_side, i / image_side,
+                                   ofColor(v_data[s * n_visible + i + 1] * 255.0f));
+            v_prob_images[s]->setColor(i % image_side, i / image_side,
+                                   ofColor(v_prob[s * n_visible + i + 1] * 255.0f));
+            v_images[s]->setColor(i % image_side, i / image_side,
+                              ofColor(v[s * n_visible + i + 1] * 255.0f));
+        }
+
+        for (int i = 0; i < n_hidden - 1; i++) {
+            h_data_images[s]->setColor(i % h_image_side, i / h_image_side,
+                                   ofColor(h_data[n_hidden * s + i + 1] * 255.0f));
+        }
+    }
+
     for (int i = 0; i < n_hidden - 1; i++) {
         h_data_image->setColor(i % h_image_side, i / h_image_side,
                 ofColor(h_data[i + 1] * 255.0f));
